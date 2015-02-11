@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Uncomment to print each executed line to the git push side.
+#set -x
+
+# gitpush_to_puppet_bootstrap post-receive hook. This is good enough to 
+# check out some branch from your server side git repo and run it's deploy 
+# script, after which it can replace it with a more appropriate one.
+
+PATH=/bin:/usr/bin
+
+STAGING=<%= base_path %>/staging
+DEPLOYCMD=<%= deploy_cmd %>
+BRANCH=<%= branch %>
+
+branch_changed=0
+while read oldrev newrev refname
+do
+    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+    if [ "${BRANCH}" == "$branch" ]; then
+        branch_changed=1        
+    fi
+done
+
+if [ $branch_changed ]; then   
+   git archive ${BRANCH} | tar -C ${STAGING} -xf -
+   # Run deploy script
+   cd ${STAGING}
+   ./${DEPLOYCMD}
+fi

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Uncommment to print each line. Will send to the originating end of 
+# a git push.
+#set -x
+
+PATH=/usr/local/bin:/bin:/usr/bin
+
+PUPPET_CONF=/etc/puppet
+REPO=/var/lib/puppet-conf/repo.git
+STAGING=/var/lib/puppet-conf/staging
+LIBRARIAN=/var/lib/puppet-conf/librarian-puppet
+
+### Update post-receive hook.
+if [ -e ${STAGING}/post-receive ]; then
+    cp -v ${STAGING}/post-receive ${REPO}/hooks
+    # git prevents this without sudo
+    sudo chmod +x ${REPO}/hooks/post-receive
+fi
+
+### Bring down the puppet master
+# Assuming you're running it from the rack
+sudo service apache2 stop
+
+### Copies Puppetfile and updates modules
+mkdir -p ${LIBRARIAN}/.librarian/puppet
+if [ -e ${STAGING}/librarian-puppet-config ]; then
+    cp ${STAGING}/librarian-puppet-config ${LIBRARIAN}/.librarian/puppet/config
+fi
+cp ${STAGING}/Puppetfile ${LIBRARIAN}
+cd  ${LIBRARIAN}
+librarian-puppet update
+
+### Copy manifests into place via rsync
+sudo rsync -vr --del ${STAGING}/manifests/  ${PUPPET_CONF}/manifests/
+
+### Copies hieradata/ via rsync 
+sudo rsync -vr --del ${STAGING}/hieradata/  ${PUPPET_CONF}/hieradata/
+
+### Restarts the puppet master
+sudo service apache2 start
+
+### Clean up staging
+rm -Rf ${STAGING}/*
