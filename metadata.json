@@ -1,0 +1,11 @@
+{
+    "name": "jaydub-gitpush_to_puppet",
+    "version": "0.1.0",
+    "author": "John Morton",
+    "license": "Apache-2.0",
+    "summary": "puppetmasterd server side set up for the deployment from git of manifests, modules and hieradata.",
+    "source": "https://github.com/jaydub/gitpush_to_puppet",
+    "project_url": "https://github.com/jaydub/gitpush_to_puppet",
+    "issues_url": "https://github.com/jaydub/gitpush_to_puppet/issues",
+    "dependencies": []
+}
