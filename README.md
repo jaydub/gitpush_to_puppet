@@ -93,30 +93,51 @@ is over and above having SSH, or similiar, access to the server itself.
 
 ##Usage
 
-* put your manifests, hieradata and Puppetfile in a repository, and
-copy across the example deployment script.
+* Put your manifests, hieradata and Puppetfile in a repository, and
+  copy across the example deployment script. You can add a copy of the
+  post-receive hook script as well, if you like.
 
-* include the module on your puppetmaster and apply.
+* Include the module on your puppetmaster node and have the agent
+  apply it.
+```
+class {"gitpush_to_puppet": }
+```
 
-* add your push enabled users to the puppet-deploy group.
+* Add your push enabled users to the `puppet-deploy` group, using
+  `adduser` or puppet itself, if your users are already managed as
+  such.
+  
+* Optionally back up your manifests, hieradata and modules. Yes, they
+  will end up in the filebucket if you have that switched on, but you
+  can break the means to extract them, so be careful.
 
-* back up your manifests, hieradata and modules. Yes, they will end up
-  in the filebucket if you have that switched on, but you can break
-  the means to extract them, so be careful.
+* Set the puppetmaster server of your git repository to the newly created
+bare repository on the server, eg
+```
+git remote add puppetmaster user@puppermaster-server:var/lib/puppet-conf/repo.git
+```
 
-* set the origin server of your git repository to the newly created
-bare repository on the server.
-
-* Push!
+* Push:
+```
+git push puppetmaster
+```
 
 * Check that it worked:
 
 ** manifests and hieradata are in order
-** /var/lib/puppet-conf/librarian-puppet/modules matches your
+** `/var/lib/puppet-conf/librarian-puppet/modules` matches your
 	expectations
-** post-receive hook is in order
 
-* Flip the switch on the modules directory and run again.
+* Flip the switch on the modules directory and run again
+```
+class {"gitpush_to_puppet":
+	own_modules: true,
+}
+```
+* Check that your `/etc/puppet/modules` is a symlink to
+  `/var/lib/puppet-conf/librarian-puppet/modules`
+
+And you're done. 
 
 ###Parameters
 
