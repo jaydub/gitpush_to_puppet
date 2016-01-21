@@ -152,7 +152,8 @@ class gitpush_to_puppet (
     exec { 'librarian_puppet_init':
       provider    => 'shell',
       cwd         => "${base_path}/librarian-puppet",
-      path        => ['/bin', '/usr/bin', '/usr/local/bin'],
+      umask       => '0002',
+      path        => ['/bin', '/usr/bin', '/usr/local/bin'],      
       environment => "HOME=${base_path}/librarian-puppet",
       command     => 'librarian-puppet init',
       creates     => "${base_path}/librarian-puppet/Puppetfile",

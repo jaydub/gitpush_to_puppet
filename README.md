@@ -114,7 +114,7 @@ class {"gitpush_to_puppet": }
 * Set the puppetmaster server of your git repository to the newly created
 bare repository on the server, eg
 ```
-git remote add puppetmaster user@puppermaster-server:var/lib/puppet-conf/repo.git
+git remote add puppetmaster user@puppermaster-server:/var/lib/puppet-conf/repo.git
 ```
 
 * Push:
